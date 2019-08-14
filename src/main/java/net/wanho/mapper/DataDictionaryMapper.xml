@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.wanho.mapper.DataDictionaryMapper">
+
+    <resultMap id="dataDictionary" type="net.wanho.model.DataDictionary">
+        <id property="id" column="id"/>
+        <result property="typeCode" column="type_Code"/>
+        <result property="valueId" column="value_Id"/>
+        <result property="valueName" column="value_Name"/>
+    </resultMap>
+
+    <select id="queryAllAppStatus" resultMap="dataDictionary">
+        SELECT id,type_Code,value_Id,value_Name
+        FROM data_dictionary
+        WHERE type_Code = 'APP_STATUS'
+    </select>
+
+    <select id="queryAllFlatforms" resultMap="dataDictionary">
+        SELECT id,type_Code,value_Id,value_Name
+        FROM data_dictionary
+        WHERE type_Code = 'APP_FLATFORM'
+    </select>
+</mapper>

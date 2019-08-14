@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--property表示的是get\set方法中的字段，column表示的是数据库中的字段-->
+<!--根据开发者id查询App信息-->
+<mapper namespace="net.wanho.mapper.AppInfoMapper">
+
+    <resultMap id="base" type="net.wanho.model.AppInfo">
+        <id property="id" column="appId"></id>
+        <result property="softwareName" column="software_Name"/>
+        <result property="apkName" column="APK_Name"/>
+        <result property="softwareSize" column="software_Size"/>
+        <result property="flatformId" column="flatform_Id"/>
+        <result property="status" column="status"/>
+        <result property="downloads" column="downloads"/>
+    </resultMap>
+
+    <resultMap id="appInfoDetail" type="net.wanho.model.AppInfo" extends="base">
+        <!--封装平台信息-->
+        <association property="flatform" javaType="net.wanho.model.DataDictionary">
+            <result property="valueName" column="flatform_name"/>
+        </association>
+        <!--封装状态信息-->
+        <association property="appStatus" javaType="net.wanho.model.DataDictionary">
+            <result property="valueName" column="app_status"/>
+        </association>
+        <!--封装一级分类-->
+        <association property="categoryLevel1" javaType="net.wanho.model.AppCategory">
+            <result property="categoryName" column="categoryLevel1Name"/>
+        </association>
+        <!--封装二级分类-->
+        <association property="categoryLevel2" javaType="net.wanho.model.AppCategory">
+            <result property="categoryName" column="categoryLevel2Name"/>
+        </association>
+        <!--封装三级分类-->
+        <association property="categoryLevel3" javaType="net.wanho.model.AppCategory">
+            <result property="categoryName" column="categoryLevel3Name"/>
+        </association>
+        <!--封装版本信息-->
+        <association property="newAppVersion" javaType="net.wanho.model.AppVersion">
+            <id property="id" column="version_id"/>
+            <result property="versionNo" column="version_No"/>
+        </association>
+    </resultMap>
+
+    <!--<resultMap id="appInfoWithThreeCategoryAndVersion" type="net.wanho.model.AppInfo" extends="base">
+        &lt;!&ndash;封装了最新的app版本对象&ndash;&gt;
+        <association property="newAppVersion" javaType="net.wanho.model.AppVersion">
+            <id property="id" column="versionId"/>
+            <result column="version_No" property="versionNo"/>
+        </association>
+        <association property="categoryLevel1" javaType="net.wanho.model.AppCategory">
+            <result column="categoryLevel1Name" property="categoryName"/>
+        </association>
+        <association property="categoryLevel2" javaType="net.wanho.model.AppCategory">
+            <result column="categoryLevel2Name" property="categoryName"/>
+        </association>
+        <association property="categoryLevel3" javaType="net.wanho.model.AppCategory">
+            <result column="categoryLevel3Name" property="categoryName"/>
+        </association>
+    </resultMap>-->
+
+    <!--<select id="queryByDevUserId" resultMap="appInfoWithThreeCategoryAndVersion">
+    SELECT
+    t1.id appId,
+    t1.software_Name,
+    t1.APK_Name,
+    t1.software_Size,
+    t1.flatform_Id,
+    t1.`status`,
+    t1.downloads,
+    t1.version_Id,
+    tc1.category_Name as categoryLevel1Name,
+    tc2.category_Name as categoryLevel2Name,
+    tc3.category_Name as categoryLevel3Name,
+    t3.version_No
+
+    FROM app_info t1
+    LEFT JOIN app_category tc1 on t1.category_Level1 = tc1.id
+    LEFT JOIN app_category tc2 on t1.category_Level2 = tc2.id
+    LEFT JOIN app_category tc3 on t1.category_Level3 = tc3.id
+    LEFT JOIN app_version t3 on t1.version_Id = t3.id
+    ,dev_user t4
+    where t1.dev_Id = t4.id
+    and t4.id = #{devUserId}
+    </select>-->
+
+    <!--根据搜索条件查询-->
+    <select id="query" resultMap="appInfoDetail">
+
+        SELECT
+        t1.software_Name,
+        t1.APK_Name,
+        t1.software_Size,
+        t1.downloads,
+        t1.flatform_Id,
+        t1.status,
+        t1.version_id,
+        t2.value_Name AS appFlatform,
+        t6.value_Name AS appStatus,
+        t3.category_Name AS categoryLevel1Name,
+        t4.category_Name AS categoryLevel2Name,
+        t5.category_Name AS categoryLevel3Name,
+        t7.version_No,
+        t2.value_Name AS appFlatform,
+        t2.value_Name AS appStatus
+        FROM app_Info t1
+        LEFT JOIN data_dictionary t2 ON t1.flatform_Id = t2.value_Id
+        LEFT JOIN app_category t3 ON t1.category_Level1 = t3.id
+        LEFT JOIN app_category t4 ON t1.category_Level2 = t4.id
+        LEFT JOIN app_category t5 ON t1.category_Level3 = t5.id
+        LEFT JOIN data_dictionary t6 ON t1.`status` = t6.value_Id
+        LEFT JOIN app_version t7 ON t1.version_Id = t7.id
+        LEFT JOIN dev_user t8 ON t1.dev_id = t8.id
+
+        <where>
+            t2.type_Code = 'APP_FLATFORM'
+            AND t6.type_Code = 'APP_STATUS'
+
+            <if test="appFlatform != null">
+                AND t1.flatform_Id = #{appFlatform}
+            </if>
+            <if test="appStatus != null">
+                AND t1.`status` = #{appStatus}
+            </if>
+            <if test="levelOneId != null">
+                AND t1.category_Level1 = #{levelOneId}
+            </if>
+            <if test="levelTwoId != null">
+                AND t1.category_Level2 = #{levelTwoId}
+            </if>
+            <if test="levelThreeId != null">
+                AND t1.category_Level3 = #{levelThreeId}
+            </if>
+            <if test="softwareName != null and softwareName != ''">
+                AND t1.software_Name LIKE concat('%',#{softwareName},'%')
+            </if>
+        </where>
+    </select>
+
+    <insert id="add">
+        insert into app_info
+        <trim prefix="(" suffix=")" prefixOverrides=",">
+        <if test="softwareName !=null and softwareName!=''">
+            ,software_Name
+        </if>
+        <if test="apkName !=null and apkName!=''">
+            ,APK_Name
+        </if>
+        <if test="supportROM !=null and supportROM!=''">
+            ,support_ROM
+        </if>
+        <if test="interfaceLanguage !=null and interfaceLanguage!=''">
+            ,interface_Language
+        </if>
+        <if test="softwareSize !=null">
+            ,software_Size
+        </if>
+        <if test="updateDate !=null">
+            ,update_Date
+        </if>
+        <if test="devUser !=null and devUser.id != null">
+            ,dev_Id
+        </if>
+        <if test="appInfo !=null and appInfo != ''">
+            ,app_Info
+        </if>
+        <if test="appStatus !=null and appStatus.valueId !=null">
+            ,status
+        </if>
+        <if test="onSaleDate !=null">
+            ,on_Sale_Date
+        </if>
+        <if test="flatform !=null and flatform.valueId !=null">
+            ,flatform_Id
+        </if>
+        <if test="categoryLevel1 !=null and categoryLevel1.id !=null">
+            ,category_Level1
+        </if>
+        <if test="categoryLevel2 !=null and categoryLevel2.id !=null">
+            ,category_Level2
+        </if>
+        <if test="categoryLevel3 !=null and categoryLevel3.id !=null">
+            ,category_Level3
+        </if>
+        <if test="downloads !=null">
+            ,downloads
+        </if>
+        <if test="createdBy !=null">
+            ,created_By
+        </if>
+        <if test="modifyBy !=null">
+            ,modify_By
+        </if>
+        <if test="modifyDate !=null">
+            ,modify_Date
+        </if>
+        <if test="logoPicPath !=null">
+            ,logo_Pic_Path
+        </if>
+        <if test="logoLocPath !=null">
+            ,logo_Loc_Path
+        </if>
+        <if test="newAppVersion !=null and newAppVersion.id != null">
+            ,version_Id
+        </if>
+    </trim>
+
+    <trim prefix="values(" suffix=")" prefixOverrides=",">
+        <if test="softwareName !=null and softwareName!=''">
+            ,#{softwareName}
+        </if>
+        <if test="apkName !=null and apkName!=''">
+            ,#{apkName}
+        </if>
+        <if test="supportROM !=null and supportROM!=''">
+            ,#{supportROM}
+        </if>
+        <if test="interfaceLanguage !=null and interfaceLanguage!=''">
+            ,#{interfaceLanguage}
+        </if>
+        <if test="softwareSize !=null">
+            ,#{softwareSize}
+        </if>
+        <if test="updateDate !=null">
+            ,#{updateDate}
+        </if>
+        <if test="devUser !=null and devUser.id != null">
+            ,#{devUser.id}
+        </if>
+        <if test="appInfo !=null and appInfo != ''">
+            ,#{appInfo}
+        </if>
+        <if test="appStatus !=null and appStatus.valueId !=null">
+            ,#{appStatus.valueId}
+        </if>
+        <if test="onSaleDate !=null">
+            ,#{onSaleDate}
+        </if>
+        <if test="flatform !=null and flatform.valueId !=null">
+            ,#{flatform.valueId}
+        </if>
+        <if test="categoryLevel1 !=null and categoryLevel1.id !=null">
+            ,#{categoryLevel1.id}
+        </if>
+        <if test="categoryLevel2 !=null and categoryLevel2.id !=null">
+            ,#{categoryLevel2.id}
+        </if>
+        <if test="categoryLevel3 !=null and categoryLevel3.id !=null">
+            ,#{categoryLevel3.id}
+        </if>
+        <if test="downloads !=null">
+            ,#{downloads}
+        </if>
+        <if test="createdBy !=null">
+            ,#{createdBy}
+        </if>
+        <if test="modifyBy !=null">
+            ,#{modifyBy}
+        </if>
+        <if test="modifyDate !=null">
+            ,#{modifyDate}
+        </if>
+        <if test="logoPicPath !=null">
+            ,#{logoPicPath}
+        </if>
+        <if test="logoLocPath !=null">
+            ,#{logoLocPath}
+        </if>
+        <if test="newAppVersion !=null and newAppVersion.id != null">
+            ,#{newAppVersion.id}
+        </if>
+    </trim>
+
+    </insert>
+
+    <delete id="deleteById">
+        delete from app_info where id = #{id}
+    </delete>
+</mapper>

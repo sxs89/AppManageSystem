@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--property表示的是get\set方法中的字段，column表示的是数据库中的字段-->
+<!--根据开发者id查询App信息-->
+<mapper namespace="net.wanho.mapper.AppCategoryMapper">
+
+    <resultMap id="appCategory" type="net.wanho.model.AppCategory">
+        <id property="id" column="id"/>
+        <result property="categoryCode" column="category_Code"/>
+        <result property="categoryName" column="category_Name"/>
+        <result property="parentId" column="parent_Id"/>
+    </resultMap>
+
+    <select id="queryAllLevelOne" resultMap="appCategory">
+        SELECT id,category_Code,category_Name,parent_Id
+        FROM app_category
+        WHERE parent_Id is NULL
+    </select>
+
+    <select id="queryLevelByParentId" resultMap="appCategory">
+        SELECT id,category_Code,category_Name,parent_Id
+        FROM app_category
+        WHERE parent_Id = #{id}
+    </select>
+
+
+
+</mapper>
