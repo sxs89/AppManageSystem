@@ -37,11 +37,11 @@ public class DevAppController {
         pageInfo.setPageSize(5);
         pageInfo.setPageNum(1);
         pageInfo = appInfoService.queryByDevUserId(id,pageInfo);
+
         //查询所有的平台
         List<DataDictionary> appFlatforms = appInfoService.queryAllFlatforms();
         //查询所有的APP状态
         List<DataDictionary> appStatus = appInfoService.queryAllAppStatus();
-
         //查询所有的一级分类
         List<AppCategory> levelOne = appCategoryService.queryAllLevelOne();
 
@@ -99,8 +99,6 @@ public class DevAppController {
     public String add(AppInfo appInfo,HttpSession session){
         Object id = session.getAttribute("USER_ID");
         Long userId = Long.parseLong(id.toString());
-        System.out.println("appInfo");
-        System.out.println(appInfo);
         boolean flag = appInfoService.add(appInfo,userId);
         //转发到action
         return "forward:index/devId/"  + userId;
@@ -111,6 +109,6 @@ public class DevAppController {
         Object uid = session.getAttribute("USER_ID");
         Long userId = Long.parseLong(uid.toString());
         boolean flag = appInfoService.delete(id);
-        return "forward:index/devId/"  + userId;
+        return "redirect:/app/index/devId/" + userId;
     }
 }

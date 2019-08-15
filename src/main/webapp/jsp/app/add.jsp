@@ -77,7 +77,7 @@
                             <select name="flatform.valueId">
                                 <option value="">--请选择--</option>
                                 <c:forEach items="${appFlatforms}" var="obj">
-                                    <option value="${obj.id}">${obj.valueName}</option>
+                                    <option value="${obj.valueId}">${obj.valueName}</option>
                                 </c:forEach>
                             </select>
                         </div>

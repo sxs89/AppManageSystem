@@ -90,6 +90,7 @@
     <select id="query" resultMap="appInfoDetail">
 
         SELECT
+        t1.id appId,
         t1.software_Name,
         t1.APK_Name,
         t1.software_Size,
