@@ -77,4 +77,9 @@ public class AppInfoServiceImpl implements AppInfoService {
         }
         return false;
     }
+
+    @Override
+    public AppInfo queryById(Long id) {
+        return appInfoMapper.queryById(id);
+    }
 }

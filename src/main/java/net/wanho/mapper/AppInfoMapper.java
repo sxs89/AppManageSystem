@@ -15,4 +15,6 @@ public interface AppInfoMapper {
     int add(AppInfo appInfo);
 
     int deleteById(@Param("id") Long id);
+
+    AppInfo queryById(@Param("id") Long id);
 }

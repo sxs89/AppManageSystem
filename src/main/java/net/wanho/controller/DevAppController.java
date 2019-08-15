@@ -111,4 +111,26 @@ public class DevAppController {
         boolean flag = appInfoService.delete(id);
         return "redirect:/app/index/devId/" + userId;
     }
+
+    /**
+     * 编辑信息
+     * @param id
+     * @param session
+     * @return
+     */
+    @RequestMapping("/toEdit/{id}")
+    public String toEdit(@PathVariable("id") Long id,HttpSession session,Model model){
+        AppInfo appInfo = appInfoService.queryById(id);
+        //查询所有的平台
+        List<DataDictionary> appFlatforms = appInfoService.queryAllFlatforms();
+        //查询所有的APP状态
+        List<DataDictionary> appStatus = appInfoService.queryAllAppStatus();
+        //查询所有的一级分类
+        List<AppCategory> levelOne = appCategoryService.queryAllLevelOne();
+        model.addAttribute("appFlatforms",appFlatforms);
+        model.addAttribute("appStatus",appStatus);
+        model.addAttribute("levelOne",levelOne);
+        model.addAttribute("app",appInfo);
+        return "app/edit";
+    }
 }

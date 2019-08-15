@@ -19,4 +19,6 @@ public interface AppInfoService {
     boolean add(AppInfo appInfo, Long userId);
 
     boolean delete(Long id);
+
+    AppInfo queryById(Long id);
 }

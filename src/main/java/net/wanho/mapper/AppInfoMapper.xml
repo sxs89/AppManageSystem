@@ -15,6 +15,64 @@
         <result property="status" column="status"/>
         <result property="downloads" column="downloads"/>
     </resultMap>
+    
+    <resultMap id="appSingleDetail" type="net.wanho.model.AppInfo" extends="base">
+        <result property="appInfo" column="app_Info"/>
+        <result property="creationDate" column="creation_Date"/>
+        <result property="interfaceLanguage" column="interface_Language"/>
+        <result property="logoLocPath" column="logo_Loc_Path"/>
+        <result property="logoPicPath" column="logo_Pic_Path"/>
+        <result property="offSaleDate" column="off_Sale_Date"/>
+        <result property="onSaleDate" column="on_Sale_Date"/>
+        <result property="softwareName" column="software_Name"/>
+        <result property="supportROM" column="support_ROM"/>
+        <result property="updateDate" column="update_Date"/>
+        <!--分类信息的封装-->
+        <association property="categoryLevel1" javaType="net.wanho.model.AppCategory">
+            <id property="id" column="level1Id"/>
+            <result property="categoryName" column="categoryLevel1Name"/>
+        </association>
+        <association property="categoryLevel2" javaType="net.wanho.model.AppCategory">
+            <id property="id" column="level2Id"/>
+            <result property="categoryName" column="categoryLevel2Name"/>
+        </association>
+        <association property="categoryLevel3" javaType="net.wanho.model.AppCategory">
+            <id property="id" column="level3Id"/>
+            <result property="categoryName" column="categoryLevel3Name"/>
+        </association>
+        <!--状态信息的封装-->
+        <association property="appStatus" javaType="net.wanho.model.DataDictionary">
+            <id property="id" column="statusId"/>
+            <!--<result property="valueId" column="statusId"/>-->
+            <result property="valueName" column="statusName"/>
+        </association>
+        <!--封装平台信息-->
+        <association property="flatform" javaType="net.wanho.model.DataDictionary">
+            <result property="valueId" column="flatformId"/>
+            <result property="valueName" column="flatformName"/>
+        </association>
+        <!--最新版本信息封装-->
+        <association property="newAppVersion" javaType="net.wanho.model.AppVersion">
+            <id property="id" column="versionId"/>
+            <result property="versionNo" column="version_No"/>
+        </association>
+        <!--创建者信息的封装-->
+        <association property="createUser" javaType="net.wanho.model.DevUser">
+            <id property="id" column="createId"/>
+            <result property="devName" column="createName"/>
+        </association>
+        <!--开发者信息的封装-->
+        <association property="devUser" javaType="net.wanho.model.DevUser">
+            <id property="id" column="devId"/>
+            <result property="devName" column="devName"/>
+        </association>
+        <!--修改者信息的封装-->
+        <association property="modifyUser" javaType="net.wanho.model.DevUser">
+            <id property="id" column="modifyId"/>
+            <result property="devName" column="modifyName"/>
+        </association>
+
+    </resultMap>
 
     <resultMap id="appInfoDetail" type="net.wanho.model.AppInfo" extends="base">
         <!--封装平台信息-->
@@ -279,4 +337,32 @@
     <delete id="deleteById">
         delete from app_info where id = #{id}
     </delete>
+
+    <select id="queryById" resultMap="appSingleDetail">
+    select
+     t1.id as appId,t1.app_Info,t1.APK_Name,t1.creation_Date,t1.downloads,t1.interface_Language,t1.logo_Loc_Path,
+     t1.logo_Pic_Path,t1.off_Sale_Date,t1.on_Sale_Date,t1.software_Name,t1.software_Size,t1.support_ROM,t1.update_Date,
+     c1.id level1Id,c2.id level2Id,c3.id level3Id,
+     c1.category_Name categoryLevel1Name,c2.category_Name categoryLevel2Name,c3.category_Name categoryLevel3Name,
+     d1.id statusId,d1.value_Name statusName,
+     d2.value_Id flatformId,d2.value_Name flatformName,
+     v1.id versionId,v1.version_No,
+     u1.id createId,u1.dev_name createName,
+     u2.id modifyId,u2.dev_name modifyName,
+     u3.id devId,u3.dev_name devName
+
+    from app_info t1  left join app_category c1 on t1.category_Level1 = c1.id
+    left join app_category c2 on t1.category_Level2 = c2.id
+    left join app_category c3 on t1.category_Level3 = c3.id
+    left join data_dictionary d1 on t1.status = d1.value_Id
+    left join data_dictionary d2 on t1.flatform_Id = d2.value_Id
+    left join app_version v1 on t1.version_Id = v1.version_No
+    left join dev_user u1 on t1.created_By = u1.id
+    left join dev_user u2 on t1.modify_By = u2.id
+    left join dev_user u3 on t1.dev_Id = u3.id
+    where
+    d1.type_Code = 'APP_STATUS'
+    and t1.id = #{id}
+    
+    </select>
 </mapper>

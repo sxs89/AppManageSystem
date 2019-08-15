@@ -48,6 +48,16 @@ public class AppInfo implements Serializable {
     private DevUser devUser;
 
     /**
+     * 创建者
+     */
+    private DevUser createUser;
+
+    /**
+     * 修改者
+     */
+    private DevUser modifyUser;
+
+    /**
      * 平台信息
      * @return
      */
@@ -285,5 +295,21 @@ public class AppInfo implements Serializable {
 
     public void setAppStatus(DataDictionary appStatus) {
         this.appStatus = appStatus;
+    }
+
+    public DevUser getCreateUser() {
+        return createUser;
+    }
+
+    public void setCreateUser(DevUser createUser) {
+        this.createUser = createUser;
+    }
+
+    public DevUser getModifyUser() {
+        return modifyUser;
+    }
+
+    public void setModifyUser(DevUser modifyUser) {
+        this.modifyUser = modifyUser;
     }
 }
