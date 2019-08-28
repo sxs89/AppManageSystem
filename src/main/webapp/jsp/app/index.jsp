@@ -149,7 +149,7 @@
                         <td>
                             <a class="layui-btn layui-btn-normal" href="/app/toEdit/${obj.id}"><i class="layui-icon">&#xe642;</i></a>
                             <a class="layui-btn layui-btn-danger" href="/app/delete/${obj.id}"><i class="layui-icon">&#xe640;</i></a>
-                            <a class="layui-btn" href="/app/queryById/${obj.id}"><i class="layui-icon">&#xe615;</i></a>
+                            <a class="layui-btn" href="/app/queryDetailById/${obj.id}"><i class="layui-icon">&#xe615;</i></a>
                         </td>
                     </tr>
                     </c:forEach>
@@ -241,7 +241,7 @@
         });
         //三级分类end===================================================
 
-        //分页时间start=================================================
+        //分页事件start=================================================
         $('a[page]').click(function(){
            var pageNum = 1;  //当前页
            var currPage = '${page.pageNum}';
@@ -274,7 +274,7 @@
            //提交表单
             $('form').submit();
         });
-        //分页时间end===================================================
+        //分页事件end===================================================
 
         //保留分级目录start=============================================
         $(function(){

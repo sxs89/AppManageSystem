@@ -17,7 +17,8 @@
     <div class="layui-body">
         <!-- 内容主体区域 -->
         <div style="padding: 15px;">
-            <form class="layui-form" action="/app/add" method="post">
+            <form class="layui-form" action="/app/edit" method="post">
+                <input type="hidden" name="id" value="${app.id}">
                 <div class="layui-form-item">
 
                     <div class="layui-inline">
@@ -62,7 +63,7 @@
                     <div class="layui-inline">
                         <label class="layui-form-label">APP状态</label>
                         <div class="layui-input-inline">
-                            <select name="status">
+                            <select name="appStatus.valueId">
                                 <option value="">--请选择--</option>
                                 <c:forEach items="${appStatus}" var="obj">
                                     <option value="${obj.id}" <c:if test="${app.appStatus.id eq obj.id}">
@@ -211,6 +212,60 @@
         });
         //三级分类end===================================================
 
+        //保留分级目录start=============================================
+        $(function(){
+            //取出一级分类的值,锁定二级的值
+            var levelOne = $('#levelOne').val();
+            if (levelOne != '' && levelOne != null){
+                var levelTwo = '${app.categoryLevel2.id}';
+                if (levelTwo != null && levelTwo != undefined && levelTwo != ''){
+                    //二级曾经选过
+                    $.ajax({
+                        url:'/category/queryLevelTwoByLevelOne/' + levelOne,
+                        type:'get',
+                        success:function (data) {
+                            //根据data修改数据，重新渲染即可
+                            var html = '<option value="">--请选择--</option>';
+                            var len = data.length;
+                            <%--var levelTwo = '${appInfoDTO.levelTwoId}';--%>
+                            for (var i =0;i < len;i++){
+                                html += '<option value="' + data[i].id + '"';
+                                if (data[i].id == levelTwo) {
+                                    html += ' selected ';
+                                }
+                                html += '>' + data[i].categoryName + '</option>'
+                            }
+                            //选择levelTwo更新
+                            $("#levelTwo").html(html);
+                            form.render();    //重新渲染
+                        }
+                    });
+
+                    var levelThree = '${app.categoryLevel3.id}';
+                    $.ajax({
+                        url:"/category/queryLevelThreeBylevelTwo/" + levelTwo,
+                        type:"get",
+                        success:function (data) {
+                            //根据data修改数据，重新渲染即可
+                            var html = '<option value="">--请选择--</option>';
+                            var len = data.length;
+                            for (var i=0;i<len;i++){
+                                html += '<option value="' + data[i].id + '"';
+                                if (data[i].id == levelThree) {
+                                    html += ' selected ';
+                                }
+                                html += '>' + data[i].categoryName + '</option>'
+                            }
+                            //重新更新levelThree
+                            $("#levelThree").html(html);
+                            form.render();
+                        }
+                    });
+
+                }
+            }
+        });
+        //保留分级目录end===============================================
     });
 </script>
 </body>

@@ -21,4 +21,8 @@ public interface AppInfoService {
     boolean delete(Long id);
 
     AppInfo queryById(Long id);
+
+    void update(AppInfo appInfo);
+
+    AppInfo queryDetailById(Long id);
 }

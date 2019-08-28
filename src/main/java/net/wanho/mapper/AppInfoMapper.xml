@@ -73,6 +73,20 @@
         </association>
 
     </resultMap>
+    
+    <resultMap id="appDetailWithHistoryVersion" type="net.wanho.model.AppInfo" extends="appSingleDetail">
+        <!--历史版本信息-->
+        <collection property="appVersions" ofType="net.wanho.model.AppVersion">
+            <id property="id" column="historyVersionId"/>
+            <result property="versionNo" column="historyVersionNo"/>
+            <result property="apkFilename" column="historyApkFileName"/>
+            <result property="apklocPath" column="historyApkLocPath"/>
+            <result property="downloadLink" column="historyDownloadLink"/>
+            <result property="versionSize" column="historyVersionSize"/>
+            <result property="versionInfo" column="historyVersionInfo"/>
+        </collection>
+    </resultMap>
+
 
     <resultMap id="appInfoDetail" type="net.wanho.model.AppInfo" extends="base">
         <!--封装平台信息-->
@@ -334,6 +348,90 @@
 
     </insert>
 
+
+    <update id="updateById">
+        update app_info
+
+        <trim prefixOverrides="," prefix="set ">
+            <if test="softwareName != null and softwareName != ''">
+                ,software_Name = #{softwareName}
+            </if>
+            <if test="apkName != null and apkName != ''">
+                ,APK_Name = #{apkName}
+            </if>
+            <if test="supportROM != null and supportROM != ''">
+                ,support_ROM = #{supportROM}
+            </if>
+            <if test="interfaceLanguage != null and interfaceLanguage != ''">
+                ,interface_Language = #{interfaceLanguage}
+            </if>
+            <if test="softwareSize != null">
+                ,software_Size = #{softwareSize}
+            </if>
+            <if test="updateDate != null">
+                ,update_Date = #{updateDate}
+            </if>
+            <if test="devUser != null and devUser.id != null">
+                ,dev_Id = #{devUser.id}
+            </if>
+            <if test="appInfo != null and appInfo != ''">
+                ,app_Info = #{appInfo}
+            </if>
+            <if test="appStatus != null and appStatus.id != null">
+                ,status = #{appStatus.id}
+            </if>
+            <if test="onSaleDate != null ">
+                ,on_Sale_Date = #{onSaleDate}
+            </if>
+            <if test="offSaleDate != null ">
+                ,off_Sale_Date = #{offSaleDate}
+            </if>
+            <if test="flatform != null and flatform.valueId != ''">
+                ,flatform_Id = #{flatform.valueId}
+            </if>
+            <if test="categoryLevel1 != null and categoryLevel1.id != ''">
+                ,category_Level1 = #{categoryLevel1.id}
+            </if>
+            <if test="categoryLevel2 != null and categoryLevel2.id != ''">
+                ,category_Level2 = #{categoryLevel2.id}
+            </if>
+            <if test="categoryLevel3 != null and categoryLevel3.id != ''">
+                ,category_Level3 = #{categoryLevel3.id}
+            </if>
+            <if test="downloads != null">
+                ,downloads = #{downloads}
+            </if>
+            <if test="createUser != null and createUser.id != null">
+                ,created_By = #{createUser.id}
+            </if>
+            <if test="modifyUser != null and modifyUser.id != null">
+                ,modify_By = #{modifyUser.id}
+            </if>
+            <if test="modifyDate != null">
+                ,modify_Date = #{modifyDate}
+            </if>
+            <if test="logoPicPath != null and logoPicPath !=''">
+                ,logo_Pic_Path = #{logoPicPath}
+            </if>
+            <if test="logoLocPath != null and logoLocPath !=''">
+                ,logo_Loc_Path = #{logoLocPath}
+            </if>
+            <if test="newAppVersion != null and newAppVersion.id !=null">
+                ,version_Id = #{newAppVersion.id}
+            </if>
+            <if test="id != null">
+                ,id = #{id}
+            </if>
+        </trim>
+
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+        </where>
+
+    </update>
+
     <delete id="deleteById">
         delete from app_info where id = #{id}
     </delete>
@@ -365,4 +463,36 @@
     and t1.id = #{id}
     
     </select>
+
+    <select id="queryDetailById" resultMap="appDetailWithHistoryVersion">
+    select
+     t1.id as appId,t1.app_Info,t1.APK_Name,t1.creation_Date,t1.downloads,t1.interface_Language,t1.logo_Loc_Path,
+     t1.logo_Pic_Path,t1.off_Sale_Date,t1.on_Sale_Date,t1.software_Name,t1.software_Size,t1.support_ROM,t1.update_Date,
+     c1.id level1Id,c2.id level2Id,c3.id level3Id,
+     c1.category_Name categoryLevel1Name,c2.category_Name categoryLevel2Name,c3.category_Name categoryLevel3Name,
+     d1.id statusId,d1.value_Name statusName,
+     d2.value_Id flatformId,d2.value_Name flatformName,
+     v1.id versionId,v1.version_No,
+     u1.id createId,u1.dev_name createName,
+     u2.id modifyId,u2.dev_name modifyName,
+     u3.id devId,u3.dev_name devName,
+     v2.id historyVersionId,v2.version_No historyVersionNo,v2.apk_Filename historyApkFileName,v2.apkLoc_Path historyApkLocPath,
+     v2.download_Link historyDownloadLink,v2.version_Size historyVersionSize,v2.version_Info historyVersionInfo
+
+    from app_info t1  left join app_category c1 on t1.category_Level1 = c1.id
+    left join app_category c2 on t1.category_Level2 = c2.id
+    left join app_category c3 on t1.category_Level3 = c3.id
+    left join data_dictionary d1 on t1.status = d1.value_Id
+    left join data_dictionary d2 on t1.flatform_Id = d2.value_Id
+    left join app_version v1 on t1.version_Id = v1.version_No
+    left join dev_user u1 on t1.created_By = u1.id
+    left join dev_user u2 on t1.modify_By = u2.id
+    left join dev_user u3 on t1.dev_Id = u3.id
+    left join app_version v2 on t1.id = v2.app_Id
+    where
+    d1.type_Code = 'APP_STATUS'
+    and t1.id = #{id}
+
+    </select>
+
 </mapper>

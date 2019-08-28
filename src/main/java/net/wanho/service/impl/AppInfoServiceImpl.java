@@ -48,6 +48,9 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     @Override
     public PageInfo<AppInfo> query(AppInfoDTO appInfoDTO) {
+        if (appInfoDTO.getPageNum() == null){
+            appInfoDTO.setPageNum(1);
+        }
         PageHelper.startPage(appInfoDTO.getPageNum(),CommonCodeConstant.PAGE_SIZE);
         List<AppInfo> l = appInfoMapper.query(appInfoDTO);
         PageInfo<AppInfo> page = new PageInfo<AppInfo>(l);
@@ -81,5 +84,17 @@ public class AppInfoServiceImpl implements AppInfoService {
     @Override
     public AppInfo queryById(Long id) {
         return appInfoMapper.queryById(id);
+    }
+
+    @Override
+    public void update(AppInfo appInfo) {
+        appInfo.setModifyDate(new Date());
+        appInfo.setUpdateDate(new Date());
+        appInfoMapper.updateById(appInfo);
+    }
+
+    @Override
+    public AppInfo queryDetailById(Long id) {
+        return appInfoMapper.queryDetailById(id);
     }
 }

@@ -5,6 +5,7 @@ import net.wanho.dto.AppInfoDTO;
 import net.wanho.model.AppCategory;
 import net.wanho.model.AppInfo;
 import net.wanho.model.DataDictionary;
+import net.wanho.model.DevUser;
 import net.wanho.service.AppCategoryService;
 import net.wanho.service.AppInfoService;
 import net.wanho.service.DataDictionaryService;
@@ -133,4 +134,41 @@ public class DevAppController {
         model.addAttribute("app",appInfo);
         return "app/edit";
     }
+
+
+    /**
+     * 编辑保存信息
+     * @param appInfo
+     * @return
+     */
+    @RequestMapping("/edit")
+    public String edit(AppInfo appInfo,Model model,HttpSession session){
+        Object uid = session.getAttribute("USER_ID");
+        Long userId = Long.parseLong(uid.toString());
+        DevUser devUser = new DevUser();
+        devUser.setId(userId);
+        appInfo.setCreateUser(devUser);
+        appInfo.setCreateUser(devUser);
+        appInfo.setModifyUser(devUser);
+        appInfo.setDevUser(devUser);
+        appInfoService.update(appInfo);
+        return "redirect:/app/query";
+    }
+
+
+    /**
+     * 查询一个数据的详情信息
+     * @param id        主键id
+     * @param model     需要传输的模型
+     * @return          返回的视图界面
+     */
+    @RequestMapping("queryDetailById/{id}")
+    public String queryDetailById(@PathVariable("id") Long id, Model model){
+        AppInfo app = appInfoService.queryDetailById(id);
+        model.addAttribute("app",app);
+        return "app/detail";
+    }
+
+
+
 }
